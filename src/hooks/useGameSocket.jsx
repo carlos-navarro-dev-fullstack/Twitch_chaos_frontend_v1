@@ -2,99 +2,67 @@ import { useEffect } from "react";
 import { connectSocket, disconnectSocket } from "../services/websocket";
 import { useGameStore } from "../store/gameStore";
 
+// 🌍 API BASE DESDE .env
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:8080";
+
 export const useGameSocket = (roomId, username) => {
-
-  const setGame =
-    useGameStore((s) => s.setGame);
-
-  const setConnected =
-    useGameStore((s) => s.setConnected);
+  const setGame = useGameStore((s) => s.setGame);
+  const setConnected = useGameStore((s) => s.setConnected);
 
   useEffect(() => {
-
     if (!roomId || !username) return;
 
     let mounted = true;
 
-    async function init() {
-
+    const init = async () => {
       try {
-
         console.log("🟡 JOIN ROOM");
 
-        // 👤 REGISTRAR JUGADOR
+        // 👤 JOIN ROOM
         const joinRes = await fetch(
-          `http://localhost:8080/game/join?roomId=${roomId}&username=${username}`,
+          `${API_URL}/game/join?roomId=${roomId}&username=${username}`,
           {
             method: "POST",
           }
         );
 
-        console.log(
-          "✅ JOIN STATUS:",
-          joinRes.status
-        );
+        console.log("✅ JOIN STATUS:", joinRes.status);
 
-        // 🎮 OBTENER ESTADO INICIAL
+        // 🎮 GET INITIAL STATE
         const roomRes = await fetch(
-          `http://localhost:8080/game/room/${roomId}`
+          `${API_URL}/game/room/${roomId}`
         );
 
         const data = await roomRes.json();
 
-        console.log(
-          "🎮 ROOM DATA:",
-          data
-        );
+        console.log("🎮 ROOM DATA:", data);
 
         if (!mounted) return;
 
-        // 🔥 GUARDAR ESTADO
+        // 🔥 SAVE STATE
         setGame(data);
 
-        // 🔌 WEBSOCKET
-        connectSocket(
-          roomId,
-          (newState) => {
-
-            console.log(
-              "📡 WS UPDATE:",
-              newState
-            );
-
-            setGame(newState);
-          },
-          username
-        );
+        // 🔌 WEBSOCKET (manejado en websocket service con VITE_WS_URL)
+        connectSocket(roomId, setGame);
 
         setConnected(true);
-
       } catch (err) {
-
-        console.error(
-          "❌ Error loading room:",
-          err
-        );
-
+        console.error("❌ Error loading room:", err);
         setConnected(false);
       }
-    }
+    };
 
     init();
 
     // 🧹 CLEANUP
     return () => {
-
       mounted = false;
 
-      console.log(
-        "🧹 Disconnecting socket..."
-      );
-
+      console.log("🧹 Disconnecting socket...");
       disconnectSocket();
 
       setConnected(false);
     };
-
   }, [roomId, username]);
 };
