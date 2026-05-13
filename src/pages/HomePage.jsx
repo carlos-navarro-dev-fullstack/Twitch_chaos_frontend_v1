@@ -18,7 +18,6 @@ export default function HomePage() {
 
     try {
       const roomId = await createRoom();
-      console.log("ROOM CREATED:", roomId);
 
       useGameStore.getState().resetGame();
 
@@ -30,10 +29,6 @@ export default function HomePage() {
   }
 
   function handleJoinRoom() {
-    console.log("🟡 [JOIN] intento de unión");
-    console.log("👤 username:", username);
-    console.log("🏠 room:", roomIdInput);
-
     if (!username.trim()) {
       alert("Escribe un username primero");
       return;

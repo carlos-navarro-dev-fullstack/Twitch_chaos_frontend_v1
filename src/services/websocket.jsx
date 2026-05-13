@@ -21,7 +21,6 @@ export const connectSocket = (roomId, setGame) => {
     reconnectDelay: 5000,
 
     onConnect: () => {
-      console.log("Connected ✔️");
 
       setConnected(true);
 
@@ -36,7 +35,6 @@ export const connectSocket = (roomId, setGame) => {
     },
 
     onWebSocketClose: () => {
-      console.log("🔌 WebSocket closed");
       setConnected(false);
     },
   });
@@ -49,11 +47,8 @@ export const connectSocket = (roomId, setGame) => {
 // =====================================================
 export const sendVote = (roomId, username, option) => {
   if (!client?.connected) {
-    console.log("❌ CLIENT NOT CONNECTED");
     return;
   }
-
-  console.log("📤 ENVIANDO VOTO", { roomId, username, option });
 
   client.publish({
     destination: "/app/vote",
@@ -88,6 +83,5 @@ export const disconnectSocket = () => {
     client.deactivate();
     client = null;
     setConnected(false);
-    console.log("🔌 Socket desconectado");
   }
 };

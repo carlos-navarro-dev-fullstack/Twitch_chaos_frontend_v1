@@ -56,8 +56,6 @@ export default function RoomPage() {
     return <h1>🎮 Esperando partida...</h1>;
   }
 
-  console.log(game)
-
   // 🗳️ VOTO
   function handleVote(option) {
 

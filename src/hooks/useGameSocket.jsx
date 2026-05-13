@@ -17,8 +17,6 @@ export const useGameSocket = (roomId, username) => {
 
     const init = async () => {
       try {
-        console.log("🟡 JOIN ROOM");
-
         // 👤 JOIN ROOM
         const joinRes = await fetch(
           `${API_URL}/game/join?roomId=${roomId}&username=${username}`,
@@ -27,7 +25,6 @@ export const useGameSocket = (roomId, username) => {
           }
         );
 
-        console.log("✅ JOIN STATUS:", joinRes.status);
 
         // 🎮 GET INITIAL STATE
         const roomRes = await fetch(
@@ -36,7 +33,6 @@ export const useGameSocket = (roomId, username) => {
 
         const data = await roomRes.json();
 
-        console.log("🎮 ROOM DATA:", data);
 
         if (!mounted) return;
 
@@ -58,8 +54,6 @@ export const useGameSocket = (roomId, username) => {
     // 🧹 CLEANUP
     return () => {
       mounted = false;
-
-      console.log("🧹 Disconnecting socket...");
       disconnectSocket();
 
       setConnected(false);
