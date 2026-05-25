@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useGameSocket } from "../hooks/useGameSocket";
 import { useGameStore } from "../store/gameStore";
@@ -11,10 +11,27 @@ export default function RoomPage() {
 
   const navigate = useNavigate();
 
-  const username =
-    localStorage.getItem("username") || "guest";
+  const [roomError, setRoomError] =
+  useState(false);
 
   const game = useGameStore((s) => s.game);
+
+  useEffect(() => {
+
+    const timer = setTimeout(() => {
+
+      if (!game) {
+        setRoomError(true);
+      }
+
+    }, 4000);
+
+    return () => clearTimeout(timer);
+
+  }, [game]);
+
+  const username =
+    localStorage.getItem("username") || "guest";
 
   const connected =
     useGameStore((s) => s.connected);
@@ -40,16 +57,41 @@ export default function RoomPage() {
       .catch(console.error);
   }
 
-  // 🟡 LOADING
-  if (!connected) {
+  // 🚫 ROOM NO EXISTE
+  if (roomError) {
 
     return (
       <div style={styles.loading}>
-        <h2>🔌 Conectando al servidor...</h2>
-        <div style={styles.spinner} />
+
+        <h1>
+          🚫 Sala no encontrada
+        </h1>
+
+        <p style={{ opacity: 0.7 }}>
+          La sala ya no existe o fue cerrada
+        </p>
+
+        <button
+          style={styles.leaveBtn}
+          onClick={() => navigate("/")}
+        >
+          Volver
+        </button>
+
       </div>
     );
   }
+
+// 🟡 LOADING
+if (!connected) {
+
+  return (
+    <div style={styles.loading}>
+      <h2>🔌 Conectando al servidor...</h2>
+      <div style={styles.spinner} />
+    </div>
+  );
+}
 
   // 🎮 NO GAME
   if (!game) {
@@ -71,6 +113,7 @@ export default function RoomPage() {
       setSelected(null);
     }, 180);
   }
+  
 
   return (
 
