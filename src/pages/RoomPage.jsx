@@ -118,7 +118,7 @@ export default function RoomPage() {
       <div style={styles.optionsWrapper}>
 
         <h3 style={styles.sectionTitle}>
-          💬 A votar!!!
+          💬 A votar!!! Da tiempo a tu chat a votar
         </h3>
 
         {game.options?.map((option) => {
