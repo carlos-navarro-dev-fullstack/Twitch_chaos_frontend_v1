@@ -16,6 +16,8 @@ export default function RoomPage() {
 
   const game = useGameStore((s) => s.game);
 
+  const isGameOver = game?.state === "GAME_OVER";
+
   useEffect(() => {
 
     const timer = setTimeout(() => {
@@ -115,6 +117,37 @@ if (!connected) {
   }
   
 
+  if (isGameOver) {
+
+    const lostByFuna = game.funa >= 100;
+    const lostByReputation = game.reputation <= 0;
+
+    return (
+      <div style={styles.endScreen}>
+        <h1 style={styles.endTitle}>
+          {lostByFuna
+            ? "💀 EL STREAMER FUE CANCELADO"
+            : lostByReputation
+              ? "📉 EL STREAMER PERDIÓ TODO EL RESPETO"
+              : "🏁 FIN DEL STREAM"
+          }
+        </h1>
+
+        <p style={styles.endText}>
+          Funa: {game.funa} / 100 <br />
+          Reputación: {game.reputation} / 100
+        </p>
+
+        <button
+          style={styles.endButton}
+          onClick={() => navigate("/")}
+        >
+          Volver al inicio
+        </button>
+      </div>
+    );
+  }
+
   return (
 
     <div style={styles.container}>
@@ -166,27 +199,24 @@ if (!connected) {
 
         {game.options?.map((option) => {
 
-          const percent =
-            game.votePercentages?.[option] || 0;
-
-          const votes =
-            game.voteCounts?.[option] || 0;
+          const percent = game.votePercentages?.[option.text] || 0;
+          const votes = game.voteCounts?.[option.text] || 0;
 
           return (
 
             <button
-              key={option}
-              onClick={() => handleVote(option)}
+              key={option.text}
+              onClick={() => handleVote(option.text)}
               style={{
                 ...styles.optionCard,
 
                 border:
-                  selected === option
+                  selected === option.text
                     ? "2px solid #8b5cf6"
                     : "2px solid transparent",
 
                 transform:
-                  selected === option
+                  selected === option.text
                     ? "scale(0.98)"
                     : "scale(1)",
               }}
@@ -195,7 +225,7 @@ if (!connected) {
               {/* TEXTO */}
               <div style={styles.optionTop}>
 
-                <span>{option}</span>
+                <span>{option.text}</span>
 
                 <span style={styles.percent}>
                   {percent}%
@@ -264,7 +294,7 @@ if (!connected) {
               🎥 Streamer eligió:
               <strong>
                 {" "}
-                {game.streamerChoice}
+                {game.streamerChoice.text}
               </strong>
             </div>
           )}
@@ -587,4 +617,38 @@ const styles = {
 
     boxShadow: "0 0 25px rgba(168,85,247,0.35)",
   },
+
+  endScreen: {
+    minHeight: "100vh",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    background: "radial-gradient(circle at top, #1a1a1a, #000)",
+    color: "white",
+    textAlign: "center",
+    padding: 40,
+  },
+
+  endTitle: {
+    fontSize: 42,
+    fontWeight: 900,
+    marginBottom: 20,
+  },
+
+  endText: {
+    fontSize: 18,
+    color: "#a1a1aa",
+    marginBottom: 30,
+  },
+
+  endButton: {
+    padding: "14px 28px",
+    borderRadius: 14,
+    border: "none",
+    fontWeight: 800,
+    cursor: "pointer",
+    background: "linear-gradient(90deg,#7c3aed,#ec4899)",
+    color: "white",
+  }
 };
